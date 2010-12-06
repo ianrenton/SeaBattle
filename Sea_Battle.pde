@@ -2,7 +2,7 @@
 float RESEARCH_TIME = 1.5; // Higher numbers slow down research
 int AI_BUILD_THINKING_TIME = 300; // Number of ticks AI takes to decide on a build.  Lost on 240, easy win on 500
 
-boolean DEBUG = true;
+boolean DEBUG = false;
 
 BuildQueue myQueue = new BuildQueue(true);
 BuildQueue enemyQueue = new BuildQueue(false);
