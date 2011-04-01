@@ -1,4 +1,5 @@
 boolean DEBUG = false;
+String version = "0.2";
 
 // Game speed settings
 float RESEARCH_TIME = 1.5; // Higher numbers slow down research
@@ -136,7 +137,7 @@ void mouseClicked() {
   if (DEBUG) println("Click");
   if (!playing) {
     // At menu
-    if ((mouseX > 100) && (mouseX < width-200) && (mouseY > height/2-100) && (mouseY < height/2-60)) {
+    if ((mouseX > 100) && (mouseX < width-100) && (mouseY > height/2-100) && (mouseY < height/2-60)) {
       playing = true;
       menuMessage = "";
     }
@@ -229,9 +230,10 @@ void drawUI() {
     fill(0);
     rect(width-190+(19*i),height-64,10,10);
   }
-  // Build configuration headers
   textFont(smallFont);
   fill(255);
+  
+  // Build configuration headers
   text("Hull", width - 180, 60);
   text("Weapon", width - 148, 60);
   text("Engines", width - 98, 60);
@@ -240,6 +242,7 @@ void drawUI() {
   text("Build", width - 190, height-68);
   text("Research", width - 190, height-93);
 
+  text("v"+version, width-40, 40);
   textFont(titleFont);
   text("Sea Battle", width-187, 25);
   textFont(buttonFont);
@@ -343,10 +346,10 @@ void spawn(boolean player, Ship ship) {
           found = true;
         }
       }
-      jump += 15;
+      jump += 20;
     } 
-    while (found && (jump < 150));
-    ship.xPos = MY_BASE_X + jump - 15;
+    while (found && (jump < 200));
+    ship.xPos = MY_BASE_X + jump - 20;
 
     myShips.add(ship);
   } 
@@ -362,10 +365,10 @@ void spawn(boolean player, Ship ship) {
           found = true;
         }
       }
-      jump += 15;
+      jump += 20;
     } 
-    while (found && (jump < 150));
-    ship.xPos = ENEMY_BASE_X - jump + 15;
+    while (found && (jump < 200));
+    ship.xPos = ENEMY_BASE_X - jump + 20;
     
     enemyShips.add(ship);
   }

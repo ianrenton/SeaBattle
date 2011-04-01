@@ -76,6 +76,25 @@ class Ship extends Damageable {
   // Movement routine - enemy ships must run ai() first, player ships can just run this.
   void move() {
     // Movement Decision-making /////
+    // Find closest ship position in case we need to move away from it
+    Ship closestShip = null;
+    float minDistanceToShip = 9999;
+    for (int i=0; i<myShips.size(); i++) {
+      float dist = distance(xPos, yPos, myShips.get(i).xPos, myShips.get(i).yPos);
+      // Dist>0.1 check to make sure we don't compare against the ship that's checking.
+      if ((dist < minDistanceToShip) && (dist>0.1)) {
+        closestShip = myShips.get(i);
+        minDistanceToShip = dist;
+      }
+    }
+    for (int i=0; i<enemyShips.size(); i++) {
+      float dist = distance(xPos, yPos, enemyShips.get(i).xPos, enemyShips.get(i).yPos);
+      // Dist>0.1 check to make sure we don't compare against the ship that's checking.
+      if ((dist < minDistanceToShip) && (dist>0.1)) {
+        closestShip = enemyShips.get(i);
+        minDistanceToShip = dist;
+      }
+    }
     
     if ((distance(xPos, yPos, xGoal, yGoal) < 10+(maxSpeed/2)) || (movingToGoal == false)) {
       // Close enough or no target, so stop.  As turn rate is based on maxSpeed, accuracy
@@ -113,6 +132,23 @@ class Ship extends Damageable {
     if (bearing >= 360) bearing -= 360;
     if (bearing < 0) bearing += 360;
     
+    // Prevent running into ally ships
+    try {
+      if ((closestShip != null) && (minDistanceToShip < 20)) {
+        float xDist = xPos - closestShip.xPos;
+        if ((xDist < 0) && (xDist > -10)) {
+          xPos--;
+        } else if ((xDist >= 0) && (xDist < 10)) {
+          xPos++;
+        }
+        float yDist = yPos - closestShip.yPos;
+        if ((yDist < 0) && (yDist > -10)) {
+          yPos--;
+        } else if ((yDist >= 0) && (yDist < 10)) {
+          yPos++;
+        }
+      }
+    } catch (IndexOutOfBoundsException ex) {}
     
     // Targetting /////
     
