@@ -2,6 +2,7 @@ class BuildQueue {
   boolean player;
   ArrayList<Ship> queue = new ArrayList<Ship>();
   int aiBuildTicker = 0;
+  int aiBuildNumber = 0;
   int spawnTicker = 0;
   int spawnTickerStartedFrom = 0;
   int maxHull = 0;
@@ -28,29 +29,40 @@ class BuildQueue {
       aiBuildTicker++;
       
       // Everything has a "thinking" delay
-      if (aiBuildTicker%AI_BUILD_THINKING_TIME == 0) {
+      if (aiBuildTicker%(aiLevelThinkTimes[aiLevel]) == 0) {
         
         // Only build when queue is empty, so we're always building the latest stuff
         if (queue.size() == 0) {
           // Pick what to build.
           // Hull: random
-          // Weapon: random from the top half of what's researched
+          // Weapon: random from the top half of what's researched, unless AI level
+          // is harsh and only picks the best
           // Engine/Radar: always max.
           selectedHull = int(floor(random(maxHull+1)));
-          selectedWeapon = int(floor(random((maxWeapon+1)/2) + ((maxWeapon+1)/2)));
+          if (aiLevelOnlyBuildBestWeapon[aiLevel]) {
+            selectedWeapon = maxWeapon;
+          } else {
+            selectedWeapon = int(floor(random((maxWeapon+1)/2) + ((maxWeapon+1)/2)));
+          }
           selectedEngine = maxEngine;
           selectedRadar = maxRadar;
           build(selectedHull, selectedWeapon, selectedEngine, selectedRadar);
+          
+          // Command ships to go once a fleet is built up
+          aiBuildNumber++;
+          if (aiBuildNumber % aiLevelFleetSize[aiLevel] == 0) {
+            for (int i=0; i<enemyShips.size(); i++) enemyShips.get(i).commandToGo();
+          }
         }
         
         // Only research when able
         if (!researching) {
-          int[] maxLevels = { maxHull, maxWeapon, maxEngine, maxRadar };
+          int[] maxLevels = { maxHull, maxWeapon-aiLevelPrioritiseWeapons[aiLevel], maxEngine, maxRadar-aiLevelPrioritiseRadar[aiLevel] };
           int minMaxLevel = min(maxLevels);
           if (maxHull == minMaxLevel) setResearchComponent(0, minMaxLevel+1);
-          else if (maxWeapon == minMaxLevel) setResearchComponent(1, minMaxLevel+1);
+          else if (maxWeapon-aiLevelPrioritiseWeapons[aiLevel] == minMaxLevel) setResearchComponent(1, minMaxLevel+1+aiLevelPrioritiseWeapons[aiLevel]);
           else if (maxEngine == minMaxLevel) setResearchComponent(2, minMaxLevel+1);
-          else setResearchComponent(3, minMaxLevel+1);
+          else setResearchComponent(3, minMaxLevel+1+aiLevelPrioritiseRadar[aiLevel]);
         }
       }
     }

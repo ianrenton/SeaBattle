@@ -10,52 +10,52 @@ class Hull {
     
     switch(type) {
       case 0:
-        armour = 20;
+        armour = 40;
         buildTime = 120;
         weight = 1000;
         break;
       case 1:
-        armour = 30;
+        armour = 60;
         buildTime = 150;
         weight = 1500;
         break;
       case 2:
-        armour = 50;
+        armour = 100;
         buildTime = 180;
         weight = 2000;
         break;
       case 3:
-        armour = 100;
+        armour = 200;
         buildTime = 250;
         weight = 4000;
         break;
       case 4:
-        armour = 200;
+        armour = 400;
         buildTime = 400;
         weight = 6000;
         break;
       case 5:
-        armour = 100;
+        armour = 500;
         buildTime = 300;
         weight = 5000;
         break;
       case 6:
-        armour = 400;
+        armour = 800;
         buildTime = 550;
         weight = 8000;
         break;
       case 7:
-        armour = 500;
+        armour = 1000;
         buildTime = 700;
         weight = 12000;
         break;
       case 8:
-        armour = 800;
+        armour = 1600;
         buildTime = 800;
         weight = 15000;
         break;
       case 9:
-        armour = 1200;
+        armour = 2500;
         buildTime = 1000;
         weight = 20000;
         break;

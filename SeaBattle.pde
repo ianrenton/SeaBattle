@@ -1,9 +1,20 @@
-// DIFFICULTY OPTIONS //
-float RESEARCH_TIME = 1.5; // Higher numbers slow down research
-int AI_BUILD_THINKING_TIME = 300; // Number of ticks AI takes to decide on a build.  Lost on 240, easy win on 500
-
 boolean DEBUG = false;
 
+// Game speed settings
+float RESEARCH_TIME = 1.5; // Higher numbers slow down research
+
+// AI Settings.
+// Better AIs think faster, build bigger fleets, prioritise weapons and prioritise radars.
+String[] aiLevelNames = new String[]{"Trivial", "Easy", "Moderate", "Hard","Insane"};
+int[] aiLevelThinkTimes = new int[]{400,300,200,100,1};
+int[] aiLevelFleetSize = new int[]{1,2,3,4,4};
+int[] aiLevelPrioritiseWeapons = new int[]{0,0,1,2,4};
+int[] aiLevelPrioritiseRadar = new int[]{0,0,0,1,3};
+boolean[] aiLevelOnlyBuildBestWeapon = new boolean[]{false,false,false,false,true};
+
+boolean playing = false;
+int aiLevel = 1;
+String menuMessage = "";
 BuildQueue myQueue = new BuildQueue(true);
 BuildQueue enemyQueue = new BuildQueue(false);
 Base myBase;
@@ -47,7 +58,10 @@ void setup() {
 }
 
 void draw() {
-  if (!myBase.isDead() && !enemyBase.isDead()) {
+  if (!playing) {
+    // Menu condition
+    drawMenu(menuMessage);
+  } else if (!myBase.isDead() && !enemyBase.isDead()) {
     // Normal condition, play game
     // Render UI bits
     drawUI();
@@ -83,24 +97,12 @@ void draw() {
   
   } 
   else if (myBase.isDead()) {
-    // You lose
-    stroke(255);
-    fill(0);
-    rectMode(CORNER);
-    rect(100,height/2-20,width-200,40);
-    fill(255);
-    textFont(titleFont);
-    text("You Lose", width/2-70, height/2+8);
+    menuMessage = "You Lose";
+    playing = false;
   } 
   else {
-    // You win
-    stroke(255);
-    fill(0);
-    rectMode(CORNER);
-    rect(100,height/2-20,width-200,40);
-    fill(255);
-    textFont(titleFont);
-    text("You Win!", width/2-70, height/2+8);
+    menuMessage = "You Win!";
+    playing = false;
   }
 }
 
@@ -131,63 +133,76 @@ void mouseReleased() {
 }
 
 void mouseClicked() {
-  // Right-click = deselect, wherever it happens.
-  if (mouseButton == RIGHT) {
-    for (int i=0; i<myShips.size(); i++) {
-      if (myShips.get(i).selected == true) {
-        myShips.get(i).selected = false;
+  if (DEBUG) println("Click");
+  if (!playing) {
+    // At menu
+    if ((mouseX > 100) && (mouseX < width-200) && (mouseY > height/2-100) && (mouseY < height/2-60)) {
+      playing = true;
+      menuMessage = "";
+    }
+    for (int i=0; i<aiLevelNames.length; i++) {
+      if ((mouseX > width/2+11) && (mouseX < width-179) && (mouseY > height/2+(i*30)-9) && (mouseY < height/2+(i*30)+11)) {
+        aiLevel = i;
       }
     }
-    shipSelected = false;
-  } 
-  else {
-
-    // Click in game field
-    if ((mouseX > 3) && (mouseX < width-200) && (mouseY > 3) && (mouseY < height-3)) {
-      // Ship selected already, so now we're giving instructions
-      if (shipSelected) {
-        for (int i=0; i<myShips.size(); i++) {
-          if (myShips.get(i).selected == true) {
-            myShips.get(i).setGoalPosition(mouseX, mouseY);
-            myShips.get(i).selected = false;
-          }
+  } else {
+    // Right-click = deselect, wherever it happens.
+    if (mouseButton == RIGHT) {
+      for (int i=0; i<myShips.size(); i++) {
+        if (myShips.get(i).selected == true) {
+          myShips.get(i).selected = false;
         }
-        shipSelected = false;
-
-        // We're selecting a ship.
-      } 
-      else {
-        int closestShip = -1;
-        float minDistance = 75;
-        for (int i=0; i<myShips.size(); i++) {
-          float dist = distance(myShips.get(i).xPos, myShips.get(i).yPos, mouseX, mouseY);
-          if (dist < minDistance) {
-            closestShip = i;
-            minDistance = dist;
-          }
-        }
-        for (int i=0; i<myShips.size(); i++) {
-          myShips.get(i).selected = (i==closestShip)?true:false;
-        }
-        shipSelected = true;
       }
-    }
-
-    // Click on Build button
-    if ((mouseX > width-190) && (mouseX < width-10) && (mouseY > height-40) && (mouseY < height-10)) {
-      myQueue.build();
-    }
-
-    // Click on component button.  Selects it if it's researched already,
-    // attempts to research it if it's next in line.
-    for (int i=0; i<NUM_COMPONENTS; i++) {
-      for (int j=0; j<NUM_CHOICES_PER_COMPONENT; j++) {
-        if (componentButtons[i][j].isOver(mouseX, mouseY)) {
-          if (componentButtons[i][j].researched) {
-            myQueue.setSelectedComponent(i, j);
-          } 
-          else if (componentButtons[i][j-1].researched) {
-            myQueue.setResearchComponent(i, j);
+      shipSelected = false;
+    } 
+    else {
+      // Click in game field
+      if ((mouseX > 3) && (mouseX < width-200) && (mouseY > 3) && (mouseY < height-3)) {
+        // Ship selected already, so now we're giving instructions
+        if (shipSelected) {
+          for (int i=0; i<myShips.size(); i++) {
+            if (myShips.get(i).selected == true) {
+              myShips.get(i).setGoalPosition(mouseX, mouseY);
+              myShips.get(i).selected = false;
+            }
+          }
+          shipSelected = false;
+  
+          // We're selecting a ship.
+        } 
+        else {
+          int closestShip = -1;
+          float minDistance = 75;
+          for (int i=0; i<myShips.size(); i++) {
+            float dist = distance(myShips.get(i).xPos, myShips.get(i).yPos, mouseX, mouseY);
+            if (dist < minDistance) {
+              closestShip = i;
+              minDistance = dist;
+            }
+          }
+          for (int i=0; i<myShips.size(); i++) {
+            myShips.get(i).selected = (i==closestShip)?true:false;
+          }
+          shipSelected = true;
+        }
+      }
+  
+      // Click on Build button
+      if ((mouseX > width-190) && (mouseX < width-10) && (mouseY > height-40) && (mouseY < height-10)) {
+        myQueue.build();
+      }
+  
+      // Click on component button.  Selects it if it's researched already,
+      // attempts to research it if it's next in line.
+      for (int i=0; i<NUM_COMPONENTS; i++) {
+        for (int j=0; j<NUM_CHOICES_PER_COMPONENT; j++) {
+          if (componentButtons[i][j].isOver(mouseX, mouseY)) {
+            if (componentButtons[i][j].researched) {
+              myQueue.setSelectedComponent(i, j);
+            } 
+            else if (componentButtons[i][j-1].researched) {
+              myQueue.setResearchComponent(i, j);
+            }
           }
         }
       }
@@ -261,6 +276,47 @@ void drawLand() {
   endShape(CLOSE);
 }
 
+void drawMenu(String notice) {
+  drawUI();
+  myQueue.updateComponentButtons();
+  drawField();
+  myBase.display();
+  enemyBase.display();
+  rectMode(CORNER);
+  // BG Alpha
+  fill(0,0,0,128);
+  rect(0,0,width,height);
+  // Notice
+  if (!notice.equals("")) {
+    stroke(255);
+    fill(0);
+    rect(100,height/2-160,width-200,40);
+    fill(255);
+    textFont(titleFont);
+    text(notice, width/2-70, height/2-132);
+  }
+  // Start Game box
+  stroke(255);
+  fill(0);
+  rect(100,height/2-100,width-200,40);
+  fill(255);
+  textFont(titleFont);
+  text("Start Game", width/2-90, height/2-72);
+  // Difficulty box
+  fill(0);
+  rect(130,height/2-20,width-280,165);
+  fill(255);
+  textFont(buttonFont);
+  text("Difficulty:", width/2-150, height/2+8);
+  for (int i=0; i<aiLevelNames.length; i++) {
+    stroke(0);
+    fill((aiLevel == i)?255:0);
+    rect(width/2+11,height/2+(i*30)-9,width/2-190,20);
+    fill((aiLevel == i)?0:255);
+    text(aiLevelNames[i], width/2+20, height/2+8+(i*30));
+  }
+}
+
 float distance(float x1, float y1, float x2, float y2) {
   return sqrt(sq(x2-x1) + sq(y2-y1));
 }
@@ -282,7 +338,7 @@ void spawn(boolean player, Ship ship) {
     do {
       found = false;
       for (int i=0; i<myShips.size(); i++) {
-          println(myShips.get(i).xPos + "  " + MY_BASE_X + jump);
+        if (DEBUG) println(myShips.get(i).xPos + "  " + MY_BASE_X + jump);
         if ((myShips.get(i).xPos == MY_BASE_X + jump) && (myShips.get(i).yPos == MY_BASE_Y)) {
           found = true;
         }
@@ -301,7 +357,7 @@ void spawn(boolean player, Ship ship) {
     do {
       found = false;
       for (int i=0; i<enemyShips.size(); i++) {
-          println(enemyShips.get(i).xPos + "  " + (ENEMY_BASE_X - jump));
+          if (DEBUG) println(enemyShips.get(i).xPos + "  " + (ENEMY_BASE_X - jump));
         if ((enemyShips.get(i).xPos == ENEMY_BASE_X - jump) && (enemyShips.get(i).yPos == ENEMY_BASE_Y)) {
           found = true;
         }

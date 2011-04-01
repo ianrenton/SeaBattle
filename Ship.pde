@@ -12,6 +12,7 @@ class Ship extends Damageable {
   ArrayList<Ship> targets;
   Base baseTarget;
   int targetShip = -1;
+  boolean commandedToGo = false;
   Weapon weapon;
   Hull hull;
   Engine engine;
@@ -35,32 +36,39 @@ class Ship extends Damageable {
   
   // AI routine for enemy ships
   void ai() {
-    // Look for targets
-    int closestShip = -1;
-    float minDistance = 9999;
-    for (int i=0; i<myShips.size(); i++) {
-      float dist = distance(xPos, yPos, myShips.get(i).xPos, myShips.get(i).yPos);
-      // Consider ships that are less scary than this one, or that are really close for kamikaze
-      if ((dist < minDistance) && ((dist < radar.range/2) || (scariness > myShips.get(i).scariness))) {
-        closestShip = i;
-        minDistance = dist;
+    if (commandedToGo) {
+      // Look for targets
+      int closestShip = -1;
+      float minDistance = 9999;
+      for (int i=0; i<myShips.size(); i++) {
+        float dist = distance(xPos, yPos, myShips.get(i).xPos, myShips.get(i).yPos);
+        // Consider ships that are less scary than this one, or that are really close for kamikaze
+        if ((dist < minDistance) && ((dist < radar.range/2) || (scariness > myShips.get(i).scariness))) {
+          closestShip = i;
+          minDistance = dist;
+        }
       }
-    }
-    
-    // Set goals based on situation
-    if (minDistance <= radar.range*4/5) {
-      // If well within firing range, hold station
-      movingToGoal = false;
-    } else if (closestShip >= 0) {
-      // If there's a ship on the board that's outside or close to edge of
-      // firing range, move closer.
-      setGoalPosition(myShips.get(closestShip).xPos, myShips.get(closestShip).yPos);
-    } else if (distance(xPos, yPos, myBase.xPos, myBase.yPos) <= radar.range*4/5){
-      // Within firing range of player base, stop (and fire)
-      movingToGoal = false;
-    } else {
-      // No player ships to target, and not near to player base, so head for it
-      setGoalPosition(myBase.xPos, myBase.yPos);
+      
+      // Set goals based on situation
+      if (minDistance <= radar.range*3/5) {
+        // If too close, back off
+        int targetXPos = (int)(2*xPos - myShips.get(closestShip).xPos);
+        int targetYPos = (int)(2*yPos - myShips.get(closestShip).yPos);
+        setGoalPosition(targetXPos, targetYPos);
+      } else if (minDistance <= radar.range*4/5) {
+        // If well within firing range, hold station
+        movingToGoal = false;
+      } else if (closestShip >= 0) {
+        // If there's a ship on the board that's outside or close to edge of
+        // firing range, move closer.
+        setGoalPosition(myShips.get(closestShip).xPos, myShips.get(closestShip).yPos);
+      } else if (distance(xPos, yPos, myBase.xPos, myBase.yPos) <= radar.range*4/5){
+        // Within firing range of player base, stop (and fire)
+        movingToGoal = false;
+      } else {
+        // No player ships to target, and not near to player base, so head for it
+        setGoalPosition(myBase.xPos, myBase.yPos);
+      }
     }
   }
   
@@ -69,7 +77,7 @@ class Ship extends Damageable {
   void move() {
     // Movement Decision-making /////
     
-    if ((distance(xPos, yPos, xGoal, yGoal) < 5+(maxSpeed/2)) || (movingToGoal == false)) {
+    if ((distance(xPos, yPos, xGoal, yGoal) < 10+(maxSpeed/2)) || (movingToGoal == false)) {
       // Close enough or no target, so stop.  As turn rate is based on maxSpeed, accuracy
       // must be based on it too otherwise we risk continuous overshoot.
       speed = 0;
@@ -141,6 +149,10 @@ class Ship extends Damageable {
         weapon.setAbsoluteBearing(bearing);
       }
     }
+  }
+  
+  void commandToGo() {
+    commandedToGo = true;
   }
   
   void setGoalPosition(float x, float y) {
