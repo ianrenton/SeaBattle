@@ -17,7 +17,7 @@ class Ship extends Damageable {
   Hull hull;
   Engine engine;
   Radar radar;
-  float scariness = 999999; // Scariness for AI target-picking
+  float scariness; // Scariness for AI target-picking and fleet power display
   
   Ship(boolean tempPlayer, float tempXPos, float tempYPos, float tempBearing, Hull tempHull, Weapon tempWeapon, Engine tempEngine, Radar tempRadar) {
     player = tempPlayer;

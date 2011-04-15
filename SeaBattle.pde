@@ -1,5 +1,10 @@
+// SEA BATTLE v0.3
+// by Ian Renton
+// Licenced under the terms of the GNU GPL v3
+// See http://onlydreaming.net/software/seabattle for more information!
+
 boolean DEBUG = false;
-String version = "0.2";
+String version = "0.3";
 
 // Game speed settings
 float RESEARCH_TIME = 1.5; // Higher numbers slow down research
@@ -13,7 +18,9 @@ int[] aiLevelPrioritiseWeapons = new int[]{0,0,1,2,4};
 int[] aiLevelPrioritiseRadar = new int[]{0,0,0,1,3};
 boolean[] aiLevelOnlyBuildBestWeapon = new boolean[]{false,false,false,false,true};
 
+// Other variables
 boolean playing = false;
+boolean paused = false;
 int aiLevel = 1;
 String menuMessage = "";
 BuildQueue myQueue = new BuildQueue(true);
@@ -37,6 +44,7 @@ int dragStartX;
 int dragStartY;
 ComponentButton[][] componentButtons = new ComponentButton[NUM_COMPONENTS][NUM_CHOICES_PER_COMPONENT];
 
+// Run once at start to instantiate window, fonts etc.
 void setup() {
   size(600,600);
   frameRate(30);
@@ -58,30 +66,32 @@ void setup() {
   ENEMY_BASE_Y = 55;
 }
 
+// Run every iteration.  Renders everything and performs the update ticks.
 void draw() {
+  drawUI();
+  myQueue.updateComponentButtons();
+  drawField();
+  myBase.display();
+  enemyBase.display();
+  myQueue.displayResearchProgress();
+  myQueue.displayBuildProgress();
+  myQueue.displayQueueDots();
   if (!playing) {
     // Menu condition
     drawMenu(menuMessage);
+  } else if (paused) {
+    // Pause condition
+    drawPause();
   } else if (!myBase.isDead() && !enemyBase.isDead()) {
     // Normal condition, play game
-    // Render UI bits
-    drawUI();
-    myQueue.updateComponentButtons();
     // Number-crunching
     myQueue.tick();
     enemyQueue.tick();
-    myQueue.displayResearchProgress();
-    myQueue.displayBuildProgress();
-    myQueue.displayQueueDots();
     for (int i=0; i<enemyShips.size(); i++) enemyShips.get(i).ai();
     for (int i=0; i<enemyShips.size(); i++) enemyShips.get(i).move();
     for (int i=0; i<myShips.size(); i++) myShips.get(i).move();
     for (int i=0; i<enemyShips.size(); i++) if (enemyShips.get(i).isDead()) enemyShips.remove(i);
     for (int i=0; i<myShips.size(); i++) if (myShips.get(i).isDead()) myShips.remove(i);
-    // Game field rendering
-    drawField();
-    myBase.display();
-    enemyBase.display();
     for (int i=0; i<myShips.size(); i++) myShips.get(i).displayDestinationMarker();
     for (int i=0; i<enemyShips.size(); i++) enemyShips.get(i).displayHealthBar();
     for (int i=0; i<myShips.size(); i++) myShips.get(i).displayHealthBar();
@@ -107,6 +117,7 @@ void draw() {
   }
 }
 
+// Start multiple selection if mouse dragging
 void mouseDragged() {
   if (!mouseDragging) {
     dragStartX = mouseX;
@@ -115,6 +126,7 @@ void mouseDragged() {
   }
 }
 
+// End multiple selection, selecting everything inside the box
 void mouseReleased() {
   if (mouseDragging) {
     int maxX = max(mouseX, dragStartX);
@@ -133,6 +145,7 @@ void mouseReleased() {
   }
 }
 
+// Deal with left and right clicks - both on the menu and on the game field.
 void mouseClicked() {
   if (DEBUG) println("Click");
   if (!playing) {
@@ -149,12 +162,7 @@ void mouseClicked() {
   } else {
     // Right-click = deselect, wherever it happens.
     if (mouseButton == RIGHT) {
-      for (int i=0; i<myShips.size(); i++) {
-        if (myShips.get(i).selected == true) {
-          myShips.get(i).selected = false;
-        }
-      }
-      shipSelected = false;
+      deselectShips();
     } 
     else {
       // Click in game field
@@ -169,9 +177,8 @@ void mouseClicked() {
           }
           shipSelected = false;
   
+        } else {
           // We're selecting a ship.
-        } 
-        else {
           int closestShip = -1;
           float minDistance = 75;
           for (int i=0; i<myShips.size(); i++) {
@@ -211,6 +218,20 @@ void mouseClicked() {
   }
 }
 
+// P for Pause, Esc for deselect
+void keyPressed() {
+  if (key == 'p' || key == 'P') {
+    if (playing) {
+      paused = !paused;
+    }
+  }
+  if (key == ESC) {
+    key = 0; // Prevent the Escape being passed on, closing the app
+    deselectShips();
+  }
+}
+
+// Draw the main part of the UI (background, right-hand toolbar)
 void drawUI() {
   background(0);
   stroke(255);
@@ -241,14 +262,29 @@ void drawUI() {
 
   text("Build", width - 190, height-68);
   text("Research", width - 190, height-93);
+  
+  // Deployed scariness
+  text("Fleet Power:", width-190, height-130);
+  fill(color(127,127,200));
+  int scariness = 0;
+  for (int i=0; i<myShips.size(); i++) scariness += myShips.get(i).scariness;
+  text(scariness, width-100, height-130);
+  fill(color(200,127,127));
+  scariness = 0;
+  for (int i=0; i<enemyShips.size(); i++) scariness += enemyShips.get(i).scariness;
+  text(scariness, width-60, height-130);
 
+  fill(255);
   text("v"+version, width-40, 40);
   textFont(titleFont);
   text("Sea Battle", width-187, 25);
   textFont(buttonFont);
   text("BUILD", width-128, height-19);
+  
+  
 }
 
+// Draw the playing field
 void drawField() {
   // Water
   stroke(255);
@@ -266,6 +302,8 @@ void drawField() {
   popMatrix();
 }
 
+// Draw just the land - as a separate function since we draw the same thing twice,
+// only the second time is reversed.
 void drawLand() {
   noStroke();
   fill(30,200,30);
@@ -279,12 +317,8 @@ void drawLand() {
   endShape(CLOSE);
 }
 
+// Draw the New Game menu
 void drawMenu(String notice) {
-  drawUI();
-  myQueue.updateComponentButtons();
-  drawField();
-  myBase.display();
-  enemyBase.display();
   rectMode(CORNER);
   // BG Alpha
   fill(0,0,0,128);
@@ -320,10 +354,38 @@ void drawMenu(String notice) {
   }
 }
 
+// Draw the Paused box
+void drawPause() {
+  rectMode(CORNER);
+  // BG Alpha
+  fill(0,0,0,128);
+  rect(0,0,width,height);
+  // Notice
+  stroke(255);
+  fill(0);
+  rect(100,height/2-20,width-200,40);
+  fill(255);
+  textFont(titleFont);
+  text("Paused", width/2-50, height/2+8);
+}
+
+// Deselect any selected ships - as a separate function, because
+// this is called on right-click and pressing Escape
+void deselectShips() {
+  for (int i=0; i<myShips.size(); i++) {
+    if (myShips.get(i).selected == true) {
+      myShips.get(i).selected = false;
+    }
+  }
+  shipSelected = false;
+}
+
+// Utility function - calc distance between two points
 float distance(float x1, float y1, float x2, float y2) {
   return sqrt(sq(x2-x1) + sq(y2-y1));
 }
 
+// Utility function - calc angle of Y from X
 float angle(float x1, float y1, float x2, float y2) {
   float a = atan((x2-x1)/(y1-y2));
   if (y2 > y1) a = a + PI;
@@ -342,7 +404,7 @@ void spawn(boolean player, Ship ship) {
       found = false;
       for (int i=0; i<myShips.size(); i++) {
         if (DEBUG) println(myShips.get(i).xPos + "  " + MY_BASE_X + jump);
-        if ((myShips.get(i).xPos == MY_BASE_X + jump) && (myShips.get(i).yPos == MY_BASE_Y)) {
+        if ((abs(myShips.get(i).xPos - (MY_BASE_X + jump)) < 10) && (abs(myShips.get(i).yPos - MY_BASE_Y) < 10)) {
           found = true;
         }
       }
@@ -361,7 +423,7 @@ void spawn(boolean player, Ship ship) {
       found = false;
       for (int i=0; i<enemyShips.size(); i++) {
           if (DEBUG) println(enemyShips.get(i).xPos + "  " + (ENEMY_BASE_X - jump));
-        if ((enemyShips.get(i).xPos == ENEMY_BASE_X - jump) && (enemyShips.get(i).yPos == ENEMY_BASE_Y)) {
+        if ((abs(enemyShips.get(i).xPos - (ENEMY_BASE_X + jump)) < 10) && (abs(enemyShips.get(i).yPos - ENEMY_BASE_Y) < 10)) {
           found = true;
         }
       }
