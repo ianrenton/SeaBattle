@@ -24,7 +24,7 @@ Sea Battle is available in various forms, all of which require an up-to-date [Ja
   * [Play online now!](http://www.onlydreaming.net/files/SeaBattle/applet/index.html)
 
 
-  * Download it for: [Windows](http://files.ianrenton.com/SeaBattle/SeaBattle-win32.zip) | [Mac OS X](http://files.ianrenton.com/SeaBattle/SeaBattle-osx.zip) | [Linux](http://files.ianrenton.com/SeaBattle/SeaBattle-linux.zip)
+  * Download it for: [Windows](http://www.onlydreaming.net/files/SeaBattle/SeaBattle-win32.zip) | [Mac OS X](http://www.onlydreaming.net/files/SeaBattle/SeaBattle-osx.zip) | [Linux](http://www.onlydreaming.net/files/SeaBattle/SeaBattle-linux.zip)
 
 
 
