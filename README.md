@@ -9,7 +9,7 @@ Sea Battle is a casual 2D real-time strategy game inspired by Warzone 2100.  In 
 
 
 
-[![Sea Battle Screenshot](http://www.onlydreaming.net/wp-content/uploads/2010/12/wpid-SeaBattleScreenshot-287x300.jpg)](http://www.onlydreaming.net/wp-content/uploads/2010/12/wpid-SeaBattleScreenshot.png)
+![Sea Battle Screenshot](http://files.ianrenton.com/sites/blog/2010/12/wpid-SeaBattleScreenshot.png)
 
 
 
@@ -23,7 +23,6 @@ Sea Battle is available in various forms, all of which require an up-to-date [Ja
 
   * [Play online now!](http://www.onlydreaming.net/files/SeaBattle/applet/index.html)
 
-
   * Download it for: [Windows](http://www.onlydreaming.net/files/SeaBattle/SeaBattle-win32.zip) | [Mac OS X](http://www.onlydreaming.net/files/SeaBattle/SeaBattle-osx.zip) | [Linux](http://www.onlydreaming.net/files/SeaBattle/SeaBattle-linux.zip)
 
 
@@ -33,7 +32,7 @@ Sea Battle is available in various forms, all of which require an up-to-date [Ja
 
 
 
-First off, select your difficulty level and hit Start Game. Easy difficulty is selected by default -- this setting dhould be beatable once you have a little practice, or first time if you get the hang of the game quickly.
+First off, select your difficulty level and hit Start Game. Easy difficulty is selected by default -- this setting should be beatable once you have a little practice, or first time if you get the hang of the game quickly.
 
 Once you're into the game, the right-hand side of the screen contains your build and research options.  You start with no ships, so that's where you'll want to begin.
 
@@ -59,7 +58,7 @@ The best research / build priorities, and advanced tactics on the game field, ar
 
 Sea Battle is currently at version 0.3. It's playable and enjoyable, but there are a few tweaks that will be required before it can be properly released as v1.0.
 
-The development of Sea Battle was documented as a [series of blog posts](http:/blog.ianrenton.com/tag/sea-battle).
+The development of Sea Battle was documented as a [series of blog posts](https://ianrenton.com/blog/sea-battle-now-with-more-processing/).
 
 
 
