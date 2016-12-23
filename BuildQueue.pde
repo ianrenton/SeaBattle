@@ -77,7 +77,7 @@ class BuildQueue {
         // If there's still something in the queue, reset the ticker.  Otherwise, leave it and
         // set the "started from" to zero.
         if (queue.size() > 0) {
-          spawnTicker = queue.get(0).hull.buildTime;
+          spawnTicker = queue.get(0).getBuildTime();
           spawnTickerStartedFrom = spawnTicker;
         } 
         else {
@@ -131,10 +131,8 @@ class BuildQueue {
       /* DEBUG print enemy build */  if ((DEBUG) && (!player)) println("Enemy build: " + hull + " " + weapon + " " + engine + " " + radar);
       // If the queue *was* empty, set the spawn ticker for this new build.
       if (queue.size() == 1) {
-        // Build time is dominated by the hull's build time, but other equipment factors in too.
-        int buildTime = (int) (BUILD_TIME * (queue.get(0).hull.buildTime + (queue.get(0).weapon.type * 10) + (queue.get(0).engine.type * 10) + (queue.get(0).radar.type * 10)));
-        spawnTicker = buildTime;
-        spawnTickerStartedFrom = buildTime;
+        spawnTicker = queue.get(0).getBuildTime();
+        spawnTickerStartedFrom = spawnTicker;
       }
     }
   }

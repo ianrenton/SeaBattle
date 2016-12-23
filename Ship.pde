@@ -299,6 +299,13 @@ class Ship extends Damageable {
     popMatrix();
   }
   
+  // Return the build time, in frame rate ticks, for a ship in this configuration
+  // Build time is dominated by the hull's build time, but other equipment factors in too.
+  int getBuildTime() {
+   return (int) (BUILD_TIME * (hull.buildTime + (weapon.type * 20) + (engine.type * 10) + (radar.type * 10))); 
+  }
+  
+  
   // Return a description of the ship for recording purposes
   String describe() {
     String s = player ? "Blue" : "Red";

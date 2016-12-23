@@ -49,34 +49,11 @@ int dragStartX;
 int dragStartY;
 ComponentButton[][] componentButtons = new ComponentButton[NUM_COMPONENTS][NUM_CHOICES_PER_COMPONENT];
 
-// Run once at start to instantiate window, fonts etc.
+// Run once at start to instantiate window.
 void setup() {
   size(600,600);
-  frameRate(30);
-
-  // Button generation
-  for (int i=0; i<NUM_COMPONENTS; i++) {
-    for (int j=0; j<NUM_CHOICES_PER_COMPONENT; j++) {
-      componentButtons[i][j] = new ComponentButton(width, height, i, j, (j==0), (j==0));
-    }
-  }
-
-  // Base generation
-  myBase = new Base(true, width, height);
-  enemyBase = new Base(false, width, height);
-  MY_BASE_X = (width-200)/2-13;
-  MY_BASE_Y = height-55;
-  ENEMY_BASE_X = (width-200)/2+10;
-  ENEMY_BASE_Y = 55;
-  
-  // Island generation
-  islands.clear();
-  for (int i=0; i<NUM_ISLANDS; i++)
-  {
-    float xPos = random(40, width-240);
-    float yPos = random(100, height-100);
-    islands.add(new Island(xPos,yPos));
-  }
+  frameRate(30); // Note that all research and build times are in "frame ticks" so changing this actually changes game speed!
+  initialSetup();
 }
 
 // Run every iteration.  Renders everything and performs the update ticks.
@@ -150,6 +127,46 @@ void draw() {
   }
 }
 
+// Setup run from the setup() method to create a game board that sits behind the menu, and
+// run again on game start to reset things (e.g. if playing a second game in a row).
+void initialSetup() {
+  // Button generation
+  for (int i=0; i<NUM_COMPONENTS; i++) {
+    for (int j=0; j<NUM_CHOICES_PER_COMPONENT; j++) {
+      componentButtons[i][j] = new ComponentButton(width, height, i, j, (j==0), (j==0));
+    }
+  }
+
+  // Base generation
+  myBase = new Base(true, width, height);
+  enemyBase = new Base(false, width, height);
+  MY_BASE_X = (width-200)/2-13;
+  MY_BASE_Y = height-55;
+  ENEMY_BASE_X = (width-200)/2+10;
+  ENEMY_BASE_Y = 55;
+}
+
+// Run on starting the game. Regens islands, removes any ships etc. from previous plays.
+void startGame() {
+  initialSetup();
+  playing = true;
+  menuMessage = "";
+  
+  // Island generation
+  islands.clear();
+  for (int i=0; i<NUM_ISLANDS; i++)
+  {
+    float xPos = random(40, width-240);
+    float yPos = random(100, height-100);
+    islands.add(new Island(xPos,yPos));
+  }
+  
+  // Clear ships and death records
+  myShips.clear();
+  enemyShips.clear();
+  deathRecords.clear();
+}
+
 // Start multiple selection if mouse dragging
 void mouseDragged() {
   if (!mouseDragging) {
@@ -184,8 +201,7 @@ void mouseClicked() {
   if (!playing) {
     // At menu
     if ((mouseX > 100) && (mouseX < width-100) && (mouseY > height/2-100) && (mouseY < height/2-60)) {
-      playing = true;
-      menuMessage = "";
+      startGame();
     }
     for (int i=0; i<aiLevelNames.length; i++) {
       if ((mouseX > width/2+11) && (mouseX < width-179) && (mouseY > height/2+(i*30)-9) && (mouseY < height/2+(i*30)+11)) {
