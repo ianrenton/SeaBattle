@@ -12,7 +12,7 @@ Sea Battle is a casual 2D real-time strategy game inspired by the unit customisa
 Sea Battle is available for various platforms, all of which require an up-to-date [Java runtime](http://java.com). Download the appropriate version for your platform below:
   * [Windows 32-bit](http://files.ianrenton.com/SeaBattle/SeaBattle-win32.zip)
   * [Windows 64-bit](http://files.ianrenton.com/SeaBattle/SeaBattle-win64.zip)
-  * [Linux x86](http://files.ianrenton.com/SeaBattle/SeaBattle-linux32.zip
+  * [Linux x86](http://files.ianrenton.com/SeaBattle/SeaBattle-linux32.zip)
   * [Linux x64](http://files.ianrenton.com/SeaBattle/SeaBattle-linux64.zip)
   * [Linux armv6hf](http://files.ianrenton.com/SeaBattle/SeaBattle-linuxarmv6.zip)
 
