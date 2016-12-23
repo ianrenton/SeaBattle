@@ -1,13 +1,14 @@
-// SEA BATTLE v0.3
+// SEA BATTLE v0.4
 // by Ian Renton
-// Licenced under the terms of the GNU GPL v3
-// See http://onlydreaming.net/software/seabattle for more information!
+// Licenced under the terms of the BSD 2-clause licence
+// See https://ianrenton.com/software/seabattle for more information!
 
 boolean DEBUG = false;
-String version = "0.3";
+String version = "0.4";
 
 // Game speed settings
 float RESEARCH_TIME = 1.5; // Higher numbers slow down research
+float BUILD_TIME = 1; // Higher numbers slow down building
 
 // AI Settings.
 // Better AIs think faster, build bigger fleets, prioritise weapons and prioritise radars.
@@ -29,9 +30,11 @@ Base myBase;
 Base enemyBase;
 ArrayList<Ship> myShips = new ArrayList<Ship>();
 ArrayList<Ship> enemyShips = new ArrayList<Ship>();
-PFont titleFont;
-PFont buttonFont;
-PFont smallFont;
+ArrayList<Island> islands = new ArrayList<Island>();
+ArrayList<DeathRecord> deathRecords = new ArrayList<DeathRecord>();
+float titleFontSize = 28;
+float buttonFontSize = 20;
+float smallFontSize = 12;
 boolean shipSelected = false;
 float MY_BASE_X;
 float MY_BASE_Y;
@@ -39,6 +42,8 @@ float ENEMY_BASE_X;
 float ENEMY_BASE_Y;
 int NUM_COMPONENTS = 4;
 int NUM_CHOICES_PER_COMPONENT = 10;
+int NUM_ISLANDS = 5;
+int ISLAND_RADIUS = 20;
 boolean mouseDragging = false;
 int dragStartX;
 int dragStartY;
@@ -48,22 +53,30 @@ ComponentButton[][] componentButtons = new ComponentButton[NUM_COMPONENTS][NUM_C
 void setup() {
   size(600,600);
   frameRate(30);
-  titleFont = loadFont("FreeMono-28.vlw");
-  buttonFont = loadFont("CourierNewPSMT-20.vlw");
-  smallFont = loadFont("LucidaSans-12.vlw");
 
+  // Button generation
   for (int i=0; i<NUM_COMPONENTS; i++) {
     for (int j=0; j<NUM_CHOICES_PER_COMPONENT; j++) {
       componentButtons[i][j] = new ComponentButton(width, height, i, j, (j==0), (j==0));
     }
   }
 
+  // Base generation
   myBase = new Base(true, width, height);
   enemyBase = new Base(false, width, height);
   MY_BASE_X = (width-200)/2-13;
   MY_BASE_Y = height-55;
   ENEMY_BASE_X = (width-200)/2+10;
   ENEMY_BASE_Y = 55;
+  
+  // Island generation
+  islands.clear();
+  for (int i=0; i<NUM_ISLANDS; i++)
+  {
+    float xPos = random(40, width-240);
+    float yPos = random(100, height-100);
+    islands.add(new Island(xPos,yPos));
+  }
 }
 
 // Run every iteration.  Renders everything and performs the update ticks.
@@ -84,19 +97,39 @@ void draw() {
     drawPause();
   } else if (!myBase.isDead() && !enemyBase.isDead()) {
     // Normal condition, play game
-    // Number-crunching
+    
+    // Process build/research queues
     myQueue.tick();
     enemyQueue.tick();
+    
+    // Move ships (includes firing)
     for (int i=0; i<enemyShips.size(); i++) enemyShips.get(i).ai();
     for (int i=0; i<enemyShips.size(); i++) enemyShips.get(i).move();
     for (int i=0; i<myShips.size(); i++) myShips.get(i).move();
-    for (int i=0; i<enemyShips.size(); i++) if (enemyShips.get(i).isDead()) enemyShips.remove(i);
-    for (int i=0; i<myShips.size(); i++) if (myShips.get(i).isDead()) myShips.remove(i);
+    
+    // Process deaths
+    for (int i=0; i<enemyShips.size(); i++) {
+      if (enemyShips.get(i).isDead()) {
+        deathRecords.add(new DeathRecord(enemyShips.get(i).lastDamageCause.describe() + " sunk " + enemyShips.get(i).describe(), true));
+        enemyShips.remove(i);
+      }
+    }
+    for (int i=0; i<myShips.size(); i++) {
+      if (myShips.get(i).isDead()) {
+        deathRecords.add(new DeathRecord(myShips.get(i).lastDamageCause.describe() + " sunk " + myShips.get(i).describe(), false));
+        myShips.remove(i);
+      }
+    }
+    
+    // Draw UI clutter
     for (int i=0; i<myShips.size(); i++) myShips.get(i).displayDestinationMarker();
     for (int i=0; i<enemyShips.size(); i++) enemyShips.get(i).displayHealthBar();
     for (int i=0; i<myShips.size(); i++) myShips.get(i).displayHealthBar();
+    
+    // Draw ships
     for (int i=0; i<enemyShips.size(); i++) enemyShips.get(i).display();
     for (int i=0; i<myShips.size(); i++) myShips.get(i).display();
+    
     // Mouse dragging
     if (mouseDragging) {
       stroke(255);
@@ -251,37 +284,47 @@ void drawUI() {
     fill(0);
     rect(width-190+(19*i),height-64,10,10);
   }
-  textFont(smallFont);
+  textSize(smallFontSize);
   fill(255);
   
   // Build configuration headers
-  text("Hull", width - 180, 60);
-  text("Weapon", width - 148, 60);
-  text("Engines", width - 98, 60);
-  text("Radar", width - 48, 60);
+  text("Hull", width - 180, 47);
+  text("Weapon", width - 148, 47);
+  text("Engines", width - 98, 47);
+  text("Radar", width - 48, 47);
 
-  text("Build", width - 190, height-68);
+  text("Build Queue", width - 190, height-68);
   text("Research", width - 190, height-93);
   
-  // Deployed scariness
-  text("Fleet Power:", width-190, height-130);
+  // Deployed Fleet Power ("scariness")
+  text("Fleet Power:", width-190, height-180);
   fill(color(127,127,200));
   int scariness = 0;
   for (int i=0; i<myShips.size(); i++) scariness += myShips.get(i).scariness;
-  text(scariness, width-100, height-130);
+  text(scariness, width-100, height-180);
   fill(color(200,127,127));
   scariness = 0;
   for (int i=0; i<enemyShips.size(); i++) scariness += enemyShips.get(i).scariness;
-  text(scariness, width-60, height-130);
+  text(scariness, width-60, height-180);
+  
+  // Latest sinkings
+  int numSinkings = Math.min(3, deathRecords.size());
+  for (int i=0; i<numSinkings; i++) {
+    DeathRecord dr = deathRecords.get(deathRecords.size()-i-1);
+    if (dr.good) {
+      fill(color(127,127,200));
+    } else {
+      fill(color(200,127,127));
+    }
+    text(dr.text, width-190, height-160+(20*i));
+  }
 
   fill(255);
-  text("v"+version, width-40, 40);
-  textFont(titleFont);
-  text("Sea Battle", width-187, 25);
-  textFont(buttonFont);
-  text("BUILD", width-128, height-19);
-  
-  
+  text("v"+version, width-40, 30);
+  textSize(titleFontSize);
+  text("Sea Battle", width-180, 30);
+  textSize(buttonFontSize);
+  text("BUILD", width-125, height-17);
 }
 
 // Draw the playing field
@@ -295,16 +338,20 @@ void drawField() {
   // Land
   pushMatrix();
   translate(4,4);
-  drawLand();
+  drawCoast();
   translate(width-204,height-7);
   rotate(radians(180));
-  drawLand();
+  drawCoast();
   popMatrix();
+  for (Island i : islands)
+  {
+    i.display();
+  }
 }
 
-// Draw just the land - as a separate function since we draw the same thing twice,
+// Draw just the coast - as a separate function since we draw the same thing twice,
 // only the second time is reversed.
-void drawLand() {
+void drawCoast() {
   noStroke();
   fill(30,200,30);
   beginShape();
@@ -329,7 +376,7 @@ void drawMenu(String notice) {
     fill(0);
     rect(100,height/2-160,width-200,40);
     fill(255);
-    textFont(titleFont);
+    textSize(titleFontSize);
     text(notice, width/2-70, height/2-132);
   }
   // Start Game box
@@ -337,18 +384,18 @@ void drawMenu(String notice) {
   fill(0);
   rect(100,height/2-100,width-200,40);
   fill(255);
-  textFont(titleFont);
-  text("Start Game", width/2-90, height/2-72);
+  textSize(titleFontSize);
+  text("Click Here to Start Game", width/2-160, height/2-70);
   // Difficulty box
   fill(0);
   rect(130,height/2-20,width-280,165);
   fill(255);
-  textFont(buttonFont);
+  textSize(buttonFontSize);
   text("Difficulty:", width/2-150, height/2+8);
   for (int i=0; i<aiLevelNames.length; i++) {
     stroke(0);
     fill((aiLevel == i)?255:0);
-    rect(width/2+11,height/2+(i*30)-9,width/2-190,20);
+    rect(width/2+11,height/2+(i*30)-11,width/2-190,24);
     fill((aiLevel == i)?0:255);
     text(aiLevelNames[i], width/2+20, height/2+8+(i*30));
   }
@@ -365,7 +412,7 @@ void drawPause() {
   fill(0);
   rect(100,height/2-20,width-200,40);
   fill(255);
-  textFont(titleFont);
+  textSize(titleFontSize);
   text("Paused", width/2-50, height/2+8);
 }
 
@@ -435,4 +482,3 @@ void spawn(boolean player, Ship ship) {
     enemyShips.add(ship);
   }
 }
-

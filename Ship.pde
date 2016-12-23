@@ -4,7 +4,7 @@ class Ship extends Damageable {
   float yPos;
   float maxSpeed;
   float speed = 0;
-  float bearing;
+  float heading;
   float xGoal = -1;
   float yGoal = -1;
   boolean movingToGoal = false;
@@ -19,12 +19,13 @@ class Ship extends Damageable {
   Radar radar;
   float scariness; // Scariness for AI target-picking and fleet power display
   
-  Ship(boolean tempPlayer, float tempXPos, float tempYPos, float tempBearing, Hull tempHull, Weapon tempWeapon, Engine tempEngine, Radar tempRadar) {
+  Ship(boolean tempPlayer, float tempXPos, float tempYPos, float tempheading, Hull tempHull, Weapon tempWeapon, Engine tempEngine, Radar tempRadar) {
     player = tempPlayer;
     xPos = tempXPos;
     yPos = tempYPos;
-    bearing = tempBearing;
+    heading = tempheading;
     weapon = tempWeapon;
+    weapon.setOwner(this);
     hull = tempHull;
     engine = tempEngine;
     radar = tempRadar;
@@ -76,23 +77,32 @@ class Ship extends Damageable {
   // Movement routine - enemy ships must run ai() first, player ships can just run this.
   void move() {
     // Movement Decision-making /////
-    // Find closest ship position in case we need to move away from it
+    // Find closest ship position and closest island in case we need to move away from it
     Ship closestShip = null;
+    Island closestIsland = null;
     float minDistanceToShip = 9999;
-    for (int i=0; i<myShips.size(); i++) {
-      float dist = distance(xPos, yPos, myShips.get(i).xPos, myShips.get(i).yPos);
+    float minDistanceToIsland = 9999;
+    for (Ship s : myShips) {
+      float dist = distance(xPos, yPos, s.xPos, s.yPos);
       // Dist>0.1 check to make sure we don't compare against the ship that's checking.
       if ((dist < minDistanceToShip) && (dist>0.1)) {
-        closestShip = myShips.get(i);
+        closestShip = s;
         minDistanceToShip = dist;
       }
     }
-    for (int i=0; i<enemyShips.size(); i++) {
-      float dist = distance(xPos, yPos, enemyShips.get(i).xPos, enemyShips.get(i).yPos);
+    for (Ship s : enemyShips) {
+      float dist = distance(xPos, yPos, s.xPos, s.yPos);
       // Dist>0.1 check to make sure we don't compare against the ship that's checking.
       if ((dist < minDistanceToShip) && (dist>0.1)) {
-        closestShip = enemyShips.get(i);
+        closestShip = s;
         minDistanceToShip = dist;
+      }
+    }
+    for (Island i : islands) {
+      float dist = distance(xPos, yPos, i.xPos, i.yPos);
+      if (dist < minDistanceToIsland) {
+        closestIsland = i;
+        minDistanceToIsland = dist;
       }
     }
     
@@ -101,40 +111,46 @@ class Ship extends Damageable {
       // must be based on it too otherwise we risk continuous overshoot.
       speed = 0;
       movingToGoal = false;
-    } else if (abs(bearing - angle(xPos, yPos, xGoal, yGoal)) < 5+maxSpeed) {
+    } else if (abs(heading - angle(xPos, yPos, xGoal, yGoal)) < 5+maxSpeed) {
       // Angle right, so set speed.  As turn rate is based on maxSpeed, accuracy
       // must be based on it too otherwise we risk continuous overshoot.
       speed = maxSpeed;
     } else {
       // Angle wrong, so turn.  Turning rate based on maxSpeed
-      float diff = bearing - angle(xPos, yPos, xGoal, yGoal);
-      if (((diff > 0) && (diff <= 180)) || (diff < -180)) bearing -= 1+(maxSpeed/2);
-      else bearing += 1+(maxSpeed/2);
-      //println(bearing + "   " + angle(xPos, yPos, xGoal, yGoal) + "   " + diff);
+      float diff = heading - angle(xPos, yPos, xGoal, yGoal);
+      if (((diff > 0) && (diff <= 180)) || (diff < -180)) heading -= 1+(maxSpeed/2);
+      else heading += 1+(maxSpeed/2);
+      if (DEBUG) println(heading + "   " + angle(xPos, yPos, xGoal, yGoal) + "   " + diff);
     }
     
-    
-    // Actual movement /////
-    
-    xPos = xPos + (speed * sin(radians(bearing)));
-    yPos = yPos - (speed * cos(radians(bearing)));
-    if (xPos > width-210) {
-      xPos = width-210;
-    } else if (xPos < 10) {
-      xPos = 10;
-    }
-    if (yPos > height-30) {
-      yPos = height-30;
-    } else if (yPos < 30) {
-      yPos = 30;
-    }
-    // Prevent runaway positive/negative bearings
-    if (bearing >= 360) bearing -= 360;
-    if (bearing < 0) bearing += 360;
-    
-    // Prevent running into ally ships
+    // Prevent running into islands and ships
     try {
-      if ((closestShip != null) && (minDistanceToShip < 20)) {
+      if ((closestIsland != null) && (minDistanceToIsland < ISLAND_RADIUS + 10)) {
+        // Move away to avoid intersecting
+        float xDist = xPos - closestIsland.xPos;
+        if ((xDist < 0) && (xDist > -ISLAND_RADIUS)) {
+          xPos--;
+        } else if ((xDist >= 0) && (xDist < ISLAND_RADIUS)) {
+          xPos++;
+        }
+        float yDist = yPos - closestIsland.yPos;
+        if ((yDist < 0) && (yDist > -ISLAND_RADIUS)) {
+          yPos--;
+        } else if ((yDist >= 0) && (yDist < ISLAND_RADIUS)) {
+          yPos++;
+        }
+        // Back up and turn away from islands
+        xPos = xPos - (speed * sin(radians(heading)));
+        yPos = yPos + (speed * cos(radians(heading)));
+        float relheading = (heading - angle(xPos, yPos, closestIsland.xPos, closestIsland.yPos));
+        if (relheading < 0) {
+          heading = heading - 45;
+        } else {
+          heading = heading + 45;
+        }
+      }
+      else if ((closestShip != null) && (minDistanceToShip < 30)) {
+        // Move away to avoid intersecting
         float xDist = xPos - closestShip.xPos;
         if ((xDist < 0) && (xDist > -10)) {
           xPos--;
@@ -147,8 +163,29 @@ class Ship extends Damageable {
         } else if ((yDist >= 0) && (yDist < 10)) {
           yPos++;
         }
+        // Don't turn away from other ships as this will make stacking them up in the shipyard
+        // (and combat) look weird.
       }
     } catch (IndexOutOfBoundsException ex) {}
+    
+    // Prevent runaway positive/negative headings
+    if (heading >= 360) heading -= 360;
+    if (heading < 0) heading += 360;
+    
+    // Actual movement /////
+    
+    xPos = xPos + (speed * sin(radians(heading)));
+    yPos = yPos - (speed * cos(radians(heading)));
+    if (xPos > width-210) {
+      xPos = width-210;
+    } else if (xPos < 10) {
+      xPos = 10;
+    }
+    if (yPos > height-30) {
+      yPos = height-30;
+    } else if (yPos < 30) {
+      yPos = 30;
+    }
     
     // Targetting /////
     
@@ -182,7 +219,7 @@ class Ship extends Damageable {
       else {
         // Base isn't targetable either, so return gun to centre.
         weapon.setTarget(null, false);
-        weapon.setAbsoluteBearing(bearing);
+        weapon.setAbsoluteBearing(heading);
       }
     }
   }
@@ -197,20 +234,21 @@ class Ship extends Damageable {
     movingToGoal = true;
   }
   
+  void damage(float damage, Ship cause) {
+    super.damage(damage, cause);
+    calcScariness();
+  }
+  
   // Calculate how scary this ship is to the AI.  TODO recalc on health loss
   void calcScariness() {
     scariness = (weapon.power / weapon.rate) * health;
   }
   
-  boolean isDead() {
-    return (health <= 0);
-  }
-  
   void display() {
-    // Switch to matrix relative to ship position and bearing
+    // Switch to matrix relative to ship position and heading
     pushMatrix();
     translate(xPos,yPos);
-    rotate(radians(bearing-90)); // -90 to translate from zero being up to being right
+    rotate(radians(heading-90)); // -90 to translate from zero being up to being right
     
     // Display radar circle
     if (selected) {
@@ -227,7 +265,7 @@ class Ship extends Damageable {
     hull.display();
     popMatrix();
     
-    // Switch to matrix relative to ship position BUT NOT bearing (for weapon & healthbar)
+    // Switch to matrix relative to ship position BUT NOT heading (for weapon & healthbar)
     pushMatrix();
     translate(xPos,yPos);
     weapon.attemptFire();
@@ -245,7 +283,7 @@ class Ship extends Damageable {
   }
   
   void displayHealthBar() {
-    // Switch to matrix relative to ship position BUT NOT bearing (for weapon & healthbar)
+    // Switch to matrix relative to ship position BUT NOT heading (for weapon & healthbar)
     pushMatrix();
     translate(xPos,yPos);
     
@@ -259,5 +297,12 @@ class Ship extends Damageable {
     rect(-10,20,healthpx,4);
     
     popMatrix();
+  }
+  
+  // Return a description of the ship for recording purposes
+  String describe() {
+    String s = player ? "Blue" : "Red";
+    s = s + " " + (hull.type+1) + "."  + (weapon.type+1) + "."  + (engine.type+1) + "."  + (radar.type+1);
+    return s;
   }
 }

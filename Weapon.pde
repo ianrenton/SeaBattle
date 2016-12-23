@@ -4,6 +4,7 @@ class Weapon {
   int rate = 9999999;
   int rateCounter = 0;
   Damageable target;
+  Ship owner;
   boolean targeting = false;
   boolean firing = false;
   
@@ -55,6 +56,12 @@ class Weapon {
         break;
     }
   }
+  
+  
+  void setOwner(Ship tempOwner) {
+    owner = tempOwner;
+  }
+    
 
   void setAbsoluteBearing(float b) {
     absoluteBearing = b;
@@ -70,7 +77,7 @@ class Weapon {
       rateCounter = (rateCounter+1)%rate;
       if (rateCounter == 0) {
         firing = true;
-        target.damage(power);
+        target.damage(power, owner);
       } else {
         firing = false;
       }
@@ -80,7 +87,6 @@ class Weapon {
   }
   
   void display() {
-    
     // Switch to a matrix rotated about the gun angle
     pushMatrix();
     rotate(radians(absoluteBearing-180)); // -180 to translate from zero being up to being down
@@ -132,6 +138,18 @@ class Weapon {
         }
         break;
       case 4:
+        strokeWeight(7);
+        line(0,0,0,10);
+        strokeWeight(2);
+        rect(-4,-5,8,10);
+        strokeWeight(1);
+        if (firing) {
+          stroke(255,0,0);
+          fill(255,0,0);
+          triangle(0,10,-3,20,3,20);
+        }
+        break;
+      case 5:
         strokeWeight(1);
         ellipseMode(CENTER);
         ellipse(0,0,8,8);
@@ -142,27 +160,15 @@ class Weapon {
           triangle(-2,7,2,7,0,15);
         }
         break;
-      case 5:
+      case 6:
         strokeWeight(1);
         ellipseMode(CENTER);
-        ellipse(0,0,7,7);
-        ellipse(0,2,4,4);
+        ellipse(0,0,8,8);
+        rect(-2,-3,4,10);
         if (firing) {
           stroke(255,0,0);
           fill(255,0,0);
-          ellipse(0,2,5,5);
-        }
-        break;
-      case 6:
-        strokeWeight(7);
-        line(0,0,0,10);
-        strokeWeight(2);
-        rect(-4,-5,8,10);
-        strokeWeight(1);
-        if (firing) {
-          stroke(255,0,0);
-          fill(255,0,0);
-          triangle(0,10,-3,20,3,20);
+          triangle(-2,7,2,7,0,15);
         }
         break;
       case 7:

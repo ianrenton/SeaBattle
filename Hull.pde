@@ -3,7 +3,6 @@ class Hull {
   float armour = 0;
   int buildTime = 9999999;
   float weight = 9999999;
-  boolean submarine = false;
   
   Hull(int tempType) {
     type = tempType;
@@ -113,16 +112,11 @@ class Hull {
         break;
       case 5:
         beginShape();
-        curveVertex(0,-4);
-        curveVertex(10,-4);
-        curveVertex(15,0);
-        curveVertex(10,4);
-        curveVertex(0,4);
-        curveVertex(0,4);
-        curveVertex(-10,4);
-        curveVertex(-15,0);
-        curveVertex(-10,-4);
-        curveVertex(0,-4);
+        vertex(20,0);
+        vertex(5,6);
+        vertex(-20,5);
+        vertex(-20,-5);
+        vertex(5,-6);
         endShape(CLOSE);
         break;
       case 6:
@@ -136,16 +130,11 @@ class Hull {
         break;
       case 7:
         beginShape();
-        curveVertex(0,-5);
-        curveVertex(15,-5);
-        curveVertex(20,0);
-        curveVertex(15,5);
-        curveVertex(0,5);
-        curveVertex(0,5);
-        curveVertex(-15,5);
-        curveVertex(-20,0);
-        curveVertex(-15,-5);
-        curveVertex(0,-5);
+        vertex(25,0);
+        vertex(6,7);
+        vertex(-25,6);
+        vertex(-25,-6);
+        vertex(6,-7);
         endShape(CLOSE);
         break;
       case 8:

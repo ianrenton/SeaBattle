@@ -13,7 +13,7 @@ class ComponentButton {
     col = tmpCol;
     row = tmpRow;
     xPos = winWidth - 189 + (46*col);
-    yPos = 70 + (35*row);
+    yPos = 55 + (35*row);
     buttonWidth = 40;
     buttonHeight = 30;
     researched = tmpResearched;
@@ -51,40 +51,40 @@ class ComponentButton {
     else if (researching) fill(0,255,0);
     else if (researched) fill(255);
     else fill(127);
-    textFont(smallFont);
+    textSize(smallFontSize);
 
     switch(col) {
     case 0:
       switch(row) {
       case 0:
-        text("PtlBt", 0, 0);
+        text("PB", 0, 0);
         break;
       case 1:
-        text("MslBt", 0, 0);
+        text("PG", 0, 0);
         break;
       case 2:
-        text("Crvtt", 0, 0);
+        text("FF", 0, 0);
         break;
       case 3:
-        text("Frigt", 0, 0);
+        text("FFG", 0, 0);
         break;
       case 4:
-        text("Dstyr", 0, 0);
+        text("DD", 0, 0);
         break;
       case 5:
-        text("SSK", 0, 0);
+        text("DDG", 0, 0);
         break;
       case 6:
-        text("Crsr", 0, 0);
+        text("CG", 0, 0);
         break;
       case 7:
-        text("SSN", 0, 0);
+        text("CB", 0, 0);
         break;
       case 8:
-        text("LPD", 0, 0);
+        text("BB", 0, 0);
         break;
       case 9:
-        text("A/cCr", 0, 0);
+        text("CV", 0, 0);
         break;
       }
       break;
@@ -103,22 +103,22 @@ class ComponentButton {
         text("8\"", 0, 0);
         break;
       case 4:
-        text("Harpn", 0, 0);
-        break;
-      case 5:
-        text("DChrg", 0, 0);
-        break;
-      case 6:
         text("15\"", 0, 0);
         break;
+      case 5:
+        text("TRP 1", 0, 0);
+        break;
+      case 6:
+        text("TRP 2", 0, 0);
+        break;
       case 7:
-        text("StRay", 0, 0);
+        text("MIS 1", 0, 0);
         break;
       case 8:
-        text("Thawk", 0, 0);
+        text("MIS 2", 0, 0);
         break;
       case 9:
-        text("RailG", 0, 0);
+        text("RAIL", 0, 0);
         break;
       }
       break;
@@ -137,56 +137,56 @@ class ComponentButton {
         text("DE 4", 0, 0);
         break;
       case 4:
-        text("Nu 1", 0, 0);
+        text("DE 5", 0, 0);
         break;
       case 5:
-        text("DETb", 0, 0);
+        text("NUC 1", 0, 0);
         break;
       case 6:
-        text("Nu 2", 0, 0);
+        text("NUC 2", 0, 0);
         break;
       case 7:
-        text("Nu 3", 0, 0);
+        text("NUC 3", 0, 0);
         break;
       case 8:
-        text("FBrdr", 0, 0);
+        text("NUC 4", 0, 0);
         break;
       case 9:
-        text("Fusn", 0, 0);
+        text("FUSN", 0, 0);
         break;
       }
       break;
     case 3:
       switch(row) {
       case 0:
-        text("R Mk1", 0, 0);
+        text("NONE", 0, 0);
         break;
       case 1:
-        text("R Mk2", 0, 0);
+        text("MK2", 0, 0);
         break;
       case 2:
-        text("R Mk3", 0, 0);
+        text("MK3", 0, 0);
         break;
       case 3:
-        text("R Mk4", 0, 0);
+        text("MK4", 0, 0);
         break;
       case 4:
-        text("R Mk5", 0, 0);
+        text("MK5", 0, 0);
         break;
       case 5:
-        text("WBR 1", 0, 0);
+        text("MK6", 0, 0);
         break;
       case 6:
-        text("WBR 2", 0, 0);
+        text("MK7", 0, 0);
         break;
       case 7:
-        text("HSR 1", 0, 0);
+        text("SUPR", 0, 0);
         break;
       case 8:
-        text("HSR 2", 0, 0);
+        text("ULTR", 0, 0);
         break;
       case 9:
-        text("EPR R", 0, 0);
+        text("SATT", 0, 0);
         break;
       }
       break;
@@ -198,4 +198,3 @@ class ComponentButton {
     return ((x >= xPos) && (x <= xPos + buttonWidth) && (y >= yPos) && (y <= yPos + buttonHeight));
   }
 }
-
