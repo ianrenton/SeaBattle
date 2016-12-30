@@ -162,22 +162,22 @@ class ComponentButton {
         text("NONE", 0, 0);
         break;
       case 1:
-        text("MK2", 0, 0);
+        text("MK1", 0, 0);
         break;
       case 2:
-        text("MK3", 0, 0);
+        text("MK2", 0, 0);
         break;
       case 3:
-        text("MK4", 0, 0);
+        text("MK3", 0, 0);
         break;
       case 4:
-        text("MK5", 0, 0);
+        text("MK4", 0, 0);
         break;
       case 5:
-        text("MK6", 0, 0);
+        text("MK5", 0, 0);
         break;
       case 6:
-        text("MK7", 0, 0);
+        text("MK6", 0, 0);
         break;
       case 7:
         text("SUPR", 0, 0);

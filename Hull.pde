@@ -16,47 +16,47 @@ class Hull {
       case 1:
         armour = 60;
         buildTime = 150;
-        weight = 1500;
+        weight = 1200;
         break;
       case 2:
         armour = 100;
         buildTime = 180;
-        weight = 2000;
+        weight = 1500;
         break;
       case 3:
         armour = 200;
         buildTime = 250;
-        weight = 4000;
+        weight = 1700;
         break;
       case 4:
         armour = 400;
         buildTime = 400;
-        weight = 6000;
+        weight = 3000;
         break;
       case 5:
         armour = 500;
         buildTime = 300;
-        weight = 5000;
+        weight = 3500;
         break;
       case 6:
         armour = 800;
         buildTime = 550;
-        weight = 8000;
+        weight = 5000;
         break;
       case 7:
         armour = 1000;
         buildTime = 700;
-        weight = 12000;
+        weight = 6000;
         break;
       case 8:
         armour = 1600;
         buildTime = 800;
-        weight = 15000;
+        weight = 8000;
         break;
       case 9:
         armour = 2500;
         buildTime = 1000;
-        weight = 20000;
+        weight = 10000;
         break;
     }
   }

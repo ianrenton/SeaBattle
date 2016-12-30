@@ -1,6 +1,6 @@
 class Base extends Damageable {
   boolean player;
-  float maxHealth = 50000;
+  float maxHealth = 25000;
   int xPos;
   int yPos;
   float orientation;

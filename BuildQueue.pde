@@ -1,26 +1,47 @@
 class BuildQueue {
   boolean player;
   ArrayList<Ship> queue = new ArrayList<Ship>();
-  int aiBuildTicker = 0;
-  int aiBuildNumber = 0;
-  int spawnTicker = 0;
-  int spawnTickerStartedFrom = 0;
-  int maxHull = 0;
-  int maxWeapon = 0;
-  int maxEngine = 0;
-  int maxRadar = 0;
-  int selectedHull = 0;
-  int selectedWeapon = 0;
-  int selectedEngine = 0;
-  int selectedRadar = 0;
-  int researchingComponent = -1;
-  boolean researching = false;
-  int researchTicker = 0;
-  int researchTickerStartedFrom = 0;
+  int aiBuildTicker;
+  int aiBuildNumber;
+  int spawnTicker;
+  int spawnTickerStartedFrom;
+  int maxHull;
+  int maxWeapon;
+  int maxEngine;
+  int maxRadar;
+  int selectedHull;
+  int selectedWeapon;
+  int selectedEngine;
+  int selectedRadar;
+  int researchingComponent;
+  boolean researching;
+  int researchTicker;
+  int researchTickerStartedFrom;
 
 
   BuildQueue(boolean tempPlayer) {
     player = tempPlayer;
+    reset();
+  }
+  
+  void reset() {
+    queue.clear();
+    aiBuildTicker = 0;
+    aiBuildNumber = 0;
+    spawnTicker = 0;
+    spawnTickerStartedFrom = 0;
+    maxHull = 0;
+    maxWeapon = 0;
+    maxEngine = 0;
+    maxRadar = 0;
+    selectedHull = 0;
+    selectedWeapon = 0;
+    selectedEngine = 0;
+    selectedRadar = 0;
+    researchingComponent = -1;
+    researching = false;
+    researchTicker = 0;
+    researchTickerStartedFrom = 0; 
   }
 
   void tick() {
@@ -70,8 +91,8 @@ class BuildQueue {
     // Count down spawn ticker
     if (queue.size() > 0) {
       spawnTicker--;
-      // If zero, we spawn the ship
-      if (spawnTicker <= 0) {
+      // If zero (or "instant buy" debug flag is set), we spawn the ship
+      if (spawnTicker <= 0 || INSTANT_BUY) {
         spawn(player, queue.get(0));
         queue.remove(0);
         // If there's still something in the queue, reset the ticker.  Otherwise, leave it and
@@ -89,8 +110,8 @@ class BuildQueue {
     // Count down research ticker
     if (researching) {
       researchTicker--;
-      // If zero, we complete research
-      if (researchTicker <= 0) {
+      // If zero (or "instant buy" debug flag is set), we complete research
+      if (researchTicker <= 0 || INSTANT_BUY) {
         switch (researchingComponent) {
         case 0:
           maxHull++;

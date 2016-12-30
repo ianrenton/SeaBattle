@@ -1,10 +1,11 @@
-// SEA BATTLE v0.4
+// SEA BATTLE v0.5
 // by Ian Renton
 // Licenced under the terms of the BSD 2-clause licence
 // See https://ianrenton.com/software/seabattle for more information!
 
-boolean DEBUG = false;
-String version = "0.4";
+boolean DEBUG = false;       // Add extra debug printlns
+boolean INSTANT_BUY = false;  // All research and building is instant, for testing
+String version = "0.5";
 
 // Game speed settings
 float RESEARCH_TIME = 1.5; // Higher numbers slow down research
@@ -86,14 +87,16 @@ void draw() {
     
     // Process deaths
     for (int i=0; i<enemyShips.size(); i++) {
-      if (enemyShips.get(i).isDead()) {
-        deathRecords.add(new DeathRecord(enemyShips.get(i).lastDamageCause.describe() + " sunk " + enemyShips.get(i).describe(), true));
+      Ship e = enemyShips.get(i);
+      if (e.isDead()) {
+        deathRecords.add(new DeathRecord(e.lastDamageCause.describe() + " sunk " + e.describe(), true));
         enemyShips.remove(i);
       }
     }
     for (int i=0; i<myShips.size(); i++) {
-      if (myShips.get(i).isDead()) {
-        deathRecords.add(new DeathRecord(myShips.get(i).lastDamageCause.describe() + " sunk " + myShips.get(i).describe(), false));
+      Ship m = myShips.get(i);
+      if (m.isDead()) {
+        deathRecords.add(new DeathRecord(m.lastDamageCause.describe() + " sunk " + m.describe(), false));
         myShips.remove(i);
       }
     }
@@ -165,6 +168,10 @@ void startGame() {
   myShips.clear();
   enemyShips.clear();
   deathRecords.clear();
+  
+  // Queue reset
+  myQueue = new BuildQueue(true);
+  enemyQueue = new BuildQueue(false);
 }
 
 // Start multiple selection if mouse dragging

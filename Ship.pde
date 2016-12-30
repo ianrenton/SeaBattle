@@ -140,8 +140,8 @@ class Ship extends Damageable {
           yPos++;
         }
         // Back up and turn away from islands
-        xPos = xPos - (speed * sin(radians(heading)));
-        yPos = yPos + (speed * cos(radians(heading)));
+        xPos = xPos + (-speed*10 * sin(radians(heading)));
+        yPos = yPos - (-speed*10 * cos(radians(heading)));
         float relheading = (heading - angle(xPos, yPos, closestIsland.xPos, closestIsland.yPos));
         if (relheading < 0) {
           heading = heading - 45;
