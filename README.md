@@ -5,17 +5,17 @@ Sea Battle is a casual 2D real-time strategy game inspired by the unit customisa
 
 ### Screenshot
 
-![Sea Battle Screenshot](http://files.ianrenton.com/SeaBattle/screenshot.png)
+![Sea Battle Screenshot](http://ianrenton.com/software/seabattle-screenshot.png)
 
 ### Play Sea Battle now!
 
 Sea Battle is available for various platforms, all of which require an up-to-date [Java runtime](http://java.com). Download the appropriate version for your platform below:
 
-  * [Windows 32-bit](http://files.ianrenton.com/SeaBattle/SeaBattle-win32.zip)
-  * [Windows 64-bit](http://files.ianrenton.com/SeaBattle/SeaBattle-win64.zip)
-  * [Linux x86](http://files.ianrenton.com/SeaBattle/SeaBattle-linux32.zip)
-  * [Linux x64](http://files.ianrenton.com/SeaBattle/SeaBattle-linux64.zip)
-  * [Linux armv6hf](http://files.ianrenton.com/SeaBattle/SeaBattle-linuxarmv6.zip)
+  * [Windows 32-bit](https://github.com/ianrenton/SeaBattle/files/702957/SeaBattle-win32.zip)
+  * [Windows 64-bit](https://github.com/ianrenton/SeaBattle/files/702956/SeaBattle-win64.zip)
+  * [Linux x86](https://github.com/ianrenton/SeaBattle/files/702953/SeaBattle-linux32.zip)
+  * [Linux x64](https://github.com/ianrenton/SeaBattle/files/702954/SeaBattle-linux64.zip)
+  * [Linux armv6hf](https://github.com/ianrenton/SeaBattle/files/702955/SeaBattle-linuxarm6.zip)
 
 ### How to Play
 
