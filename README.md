@@ -15,7 +15,7 @@ Sea Battle is available for various platforms, all of which require an up-to-dat
   * [Windows 64-bit](https://github.com/ianrenton/SeaBattle/files/702956/SeaBattle-win64.zip)
   * [Linux x86](https://github.com/ianrenton/SeaBattle/files/702953/SeaBattle-linux32.zip)
   * [Linux x64](https://github.com/ianrenton/SeaBattle/files/702954/SeaBattle-linux64.zip)
-  * [Linux armv6hf](https://github.com/ianrenton/SeaBattle/files/702955/SeaBattle-linuxarm6.zip)
+  * [Linux armv6hf](https://github.com/ianrenton/SeaBattle/files/702955/SeaBattle-linuxarm6.zip)
 
 ### How to Play
 
