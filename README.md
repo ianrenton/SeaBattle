@@ -39,7 +39,7 @@ The best research / build priorities, and advanced tactics on the game field, ar
 
 ### Development Status
 
-Sea Battle is currently at version 0.4. It's playable and enjoyable, but there are a few tweaks that will be required before it can be properly released as v1.0.
+Sea Battle is currently at version 0.5. It's basically complete, although it could probably do with a few more balance tweaks and a better route following algorithm before I'm finally happy with it.
 
 The development of Sea Battle was documented as a series of blog posts:
 
