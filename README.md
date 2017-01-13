@@ -41,11 +41,18 @@ The best research / build priorities, and advanced tactics on the game field, ar
 
 Sea Battle is currently at version 0.4. It's playable and enjoyable, but there are a few tweaks that will be required before it can be properly released as v1.0.
 
-The development of Sea Battle was documented as a [series of blog posts](https://ianrenton.com/blog/sea-battle-now-with-more-processing/).
+The development of Sea Battle was documented as a series of blog posts:
 
-### Licence and Source Code
+1. [Game Idea Spam Time!](http://ianrenton.com/blog/game-idea-spam-time/)
+2. [Sea Battle, now with more Processing](https://ianrenton.com/blog/sea-battle-now-with-more-processing/)
+3. [Sea Battle: That's what Guns are for!](http://ianrenton.com/blog/sea-battle-thats-what-guns-are-for/)
+4. [Sea Battle: Here Comes the Science Bit](http://ianrenton.com/blog/sea-battle-here-comes-the-science-bit/)
+5. [Sea Battle: Of Ships and Submarines](https://ianrenton.com/blog/sea-battle-of-ships-and-submarines/)
+6. [A Sea Battle Update?!](https://ianrenton.com/blog/a-sea-battle-update/)
 
-Sea Battle is released under the terms of the BSD licence.  Source code is included with each platform-specific download above, and you can also grab the source code here on Github.
+### Licence
+
+Sea Battle is released under the terms of the BSD licence.
 
 ### Bugs and Feature Requests
 
