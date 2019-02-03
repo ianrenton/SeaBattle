@@ -5,7 +5,7 @@ Sea Battle is a casual 2D real-time strategy game inspired by the unit customisa
 
 ### Screenshot
 
-![Sea Battle Screenshot](http://ianrenton.com/software/seabattle-screenshot.png)
+![Sea Battle Screenshot](http://ianrenton.com/wp-content/uploads/2019/02/seabattle-screenshot.png)
 
 ### Play Sea Battle now!
 
